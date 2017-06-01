@@ -1,0 +1,153 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation=" 
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:component-scan base-package="com.transporters.controller" />
+	<mvc:annotation-driven />
+	<mvc:resources mapping="resources/**" location="/resources/"></mvc:resources>
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />	
+
+	<!-- <bean id="viewResolver" -->
+	<!-- class="org.springframework.web.servlet.view.UrlBasedViewResolver"> -->
+	<!-- <property name="viewClass" -->
+	<!-- value="org.springframework.web.servlet.view.JstlView" /> -->
+	<!-- <property name="prefix" value="/WEB-INF/jsp/" /> -->
+	<!-- <property name="suffix" value=".jsp" /> -->
+	<!-- </bean> -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3308/transportcompany" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+
+	<bean id="hibernate4AnnotatedSessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>com.transporters.domain.Branch</value>
+				<value>com.transporters.domain.User</value>
+				<value>com.transporters.domain.Address</value>
+				<value>com.transporters.domain.Employee</value>
+				<value>com.transporters.domain.UType</value>
+				<value>com.transporters.domain.Customer</value>
+				<value>com.transporters.domain.Truck</value>
+				<value>com.transporters.domain.TruckStatus</value>
+				<value>com.transporters.domain.Driver</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="branchDAO" class="com.transporters.dao.BranchDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="branchService" class="com.transporters.services.BranchServiceImpl">
+		<property name="branchDAO" ref="branchDAO"></property>
+		<property name="employeeDAO" ref="employeeDAO"></property>
+		<property name="uTypeDAO" ref="uTypeDAO"></property>
+	</bean>  
+	<bean id="branchController" class="com.transporters.controller.BranchController">
+		<property name="branchService" ref="branchService"></property>
+	</bean>
+
+	<bean id="userDAO" class="com.transporters.dao.UserDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="userService" class="com.transporters.services.UserServiceImpl">
+		<property name="userDAO" ref="userDAO" />
+	</bean>
+
+	
+	<bean id="employeeDAO" class="com.transporters.dao.EmployeeDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="employeeService" class="com.transporters.services.EmployeeServiceImpl">
+		<property name="employeeDAO" ref="employeeDAO" />
+		<property name="uTypeDAO" ref="uTypeDAO" />
+		<property name="branchDAO" ref="branchDAO" />
+	</bean>
+
+	<bean id="employeeController" class="com.transporters.controller.EmployeeController">
+		<property name="employeeService" ref="employeeService" />
+	</bean>
+		
+	<bean id="uTypeDAO" class="com.transporters.dao.UTypeDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>	
+	
+	<bean id="customerDAO" class="com.transporters.dao.CustomerDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="customerService" class="com.transporters.services.CustomerServiceImpl">
+		<property name="customerDAO" ref="customerDAO" />
+		<property name="uTypeDAO" ref="uTypeDAO" />
+	</bean>
+
+	<bean id="customerController" class="com.transporters.controller.CustomerController">
+		<property name="customerService" ref="customerService" />
+	</bean>
+	
+	<bean id="truckDAO" class="com.transporters.dao.TruckDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="truckService" class="com.transporters.services.TruckServiceImpl">
+		<property name="truckDAO" ref="truckDAO" />
+	</bean>
+
+	<bean id="truckController" class="com.transporters.controller.TruckController">
+		<property name="truckService" ref="truckService" />
+	</bean>
+		<bean id="driverDAO" class="com.transporters.dao.DriverDAOImpl">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="driverService" class="com.transporters.services.DriverServiceImpl">
+		<property name="driverDAO" ref="driverDAO" />
+		<property name="uTypeDAO" ref="uTypeDAO" />
+		<property name="truckDAO" ref="truckDAO" />
+		<property name="branchDAO" ref="branchDAO" />
+	</bean> 
+
+	<bean id="driverController" class="com.transporters.controller.DriverController">
+		<property name="driverService" ref="driverService" />
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</bean>
+
+	<bean id="BranchGraphService" class="com.transporters.services.BranchGraphServiceImpl">
+		<property name="branchService" ref="branchService" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans>
