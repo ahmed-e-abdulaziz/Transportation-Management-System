@@ -18,9 +18,7 @@
 						if (parseInt('${branch.id}') >= 0) {
 							branchManagerJSONPath = 'http://localhost:8080/transporters/employee/list/only/BranchManager,OtherUser';
 						}
-						$
-								.getJSON(
-										branchManagerJSONPath,
+						$.getJSON(	branchManagerJSONPath,
 										{
 											ajax : 'true'
 										},
